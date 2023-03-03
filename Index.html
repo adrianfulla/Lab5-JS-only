@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <script type="application/javascript">
+
+      document.body.setAttribute("style", "background-color: rgb(255, 130, 216); max-width: 100%; max-height: 100%; font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;" )
+      
+      const usuario = 'Yo'
+      const Contenedor = document.createElement('div')
+      const Mensajes = document.createElement('ul')
+      Mensajes.setAttribute('style', "overflow-y: auto; background-color: purple; border-color: blanchedalmond; margin: 1em; height: 35em; padding: 10px;display:flex;flex-direction: column-reverse;")
+      
+      const ContenedorEnviar = document.createElement('div')
+      ContenedorEnviar.setAttribute('style', "display: flex; margin: 1em; height: fit-content;")
+      const input = document.createElement('textarea')
+      input.setAttribute('style', "width: 95em;height: 6em;font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;")
+      const boton = document.createElement('button')
+      boton.setAttribute('style', "width: 9em; height: 6em;")
+      boton.append('Enviar')
+      
+      ContenedorEnviar.append(input)
+      ContenedorEnviar.append(boton)
+
+      const Mensaje = (text, user) => {
+        const MSG = document.createElement('li')
+        if(user === usuario){
+          MSG.setAttribute('style', "margin: auto 0 auto auto; display: flex; justify-content: left; border-color: aliceblue; background-color: paleturquoise;; border-radius: 5px; width: 450px; max-width: 450px;overflow-wrap:anywhere;")
+          
+        }
+        else{
+          MSG.setAttribute('style', "margin: 10px; display: flex; justify-content: left; border-color: aliceblue; background-color: aqua; border-radius: 5px; width: 450px; max-width: 450px;overflow-wrap:anywhere;")
+        }
+
+
+        const inMsg = document.createElement('ul')
+        inMsg.setAttribute('style',"margin-left: -40px;")
+        const UserName = document.createElement('div')
+        UserName.setAttribute('style',"width: 440px;border-top-right-radius: 5px; border-top-left-radius: 5px; background-color:rgb(221, 140, 131); color:rgb(92, 7, 92); padding-left: 10px;")
+        const Message = document.createElement('div')
+        Message.setAttribute('style',"margin-inline: 10px;")
+
+        let regex = new RegExp(/(https?:\/\/.*\.(?:png|jpg|gif))/i);
+        if(regex.test(text) === true){
+          const imagen = document.createElement('img')
+          imagen.src = text;
+          imagen.setAttribute('style',"max-Width:400px;height:auto;")
+          Message.append(imagen)
+        }
+        else{
+          Message.append(text)
+        }
+        
+        UserName.append(`${user}: `)
+
+        inMsg.append(UserName)
+        inMsg.append(Message)
+
+        MSG.append(inMsg)
+
+        return MSG
+      }
+
+      const getMessages = async () => {
+        const response = await fetch('http://uvgenios.online/api/messages')
+        const messages = await response.json()
+
+        const lis = messages.map((message) => Mensaje(message.text, message.user))
+        lis.forEach((MSG) => Mensajes.prepend(MSG))
+      }
+
+      const postMessage = async (text) => {
+        const body = {
+          text,
+          user: usuario
+        }
+        const response = await fetch('http://uvgenios.online/api/messages', {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        return response
+      }
+            
+      getMessages()
+
+      boton.addEventListener('click', async (event) => {
+        event.preventDefault()
+
+        await postMessage(input.value)
+        Mensajes.innerHTML = ""
+        getMessages()
+
+        input.value = '';        
+      })
+
+      input.addEventListener('keypress', async function(event) {
+        if (event.key === "Enter"){
+          event.preventDefault()
+
+          await postMessage(input.value)
+          Mensajes.innerHTML = ""
+          getMessages()
+          input.value = '';
+        }
+      })
+      
+
+      setInterval(function () {
+        const scrollPos = Mensajes.scrollTop
+        Mensajes.innerHTML = ""
+        getMessages()
+      },20000)
+      
+      
+      Contenedor.append(Mensajes)
+      Contenedor.append(ContenedorEnviar)
+      document.body.append(Contenedor)
+    </script>
+  </body>
+</html>
