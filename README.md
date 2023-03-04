@@ -7,3 +7,4 @@
  <li>(10 puntos) Por agregar hacer "submit" del mensaje utilizando "Enter" </li>
  <li>(10 puntos) Auto-refresh de la lista de mensajes</li>
  <li>(30 puntos) Por detectar un link a una imagen dentro del texto y crear una preview en la lista de mensajes</li>
+ <li>(40 puntos) Por detectar un link a una página web dentro del texto y crear una preview en la lista de mensajes</li>
