@@ -41,12 +41,19 @@
         const Message = document.createElement('div')
         Message.setAttribute('style',"margin-inline: 10px;")
 
-        let regex = new RegExp(/(https?:\/\/.*\.(?:png|jpg|gif))/i);
-        if(regex.test(text) === true){
+        let regex1 = new RegExp(/(https?:\/\/.*\.(?:png|jpg|gif))/i);
+        let regex2 = new RegExp(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/);
+        if(regex1.test(text) === true){
           const imagen = document.createElement('img')
           imagen.src = text;
           imagen.setAttribute('style',"max-Width:400px;height:auto;")
           Message.append(imagen)
+        }
+        else if (regex2.test(text) === true){
+          console.log('link')
+          const link = document.createElement('iframe')
+          link.src = text;
+          Message.append(link)
         }
         else{
           Message.append(text)
@@ -90,11 +97,18 @@
       boton.addEventListener('click', async (event) => {
         event.preventDefault()
 
-        await postMessage(input.value)
-        Mensajes.innerHTML = ""
-        getMessages()
+        let regex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi);
 
-        input.value = '';        
+        console.log(input.value.length)
+        if((input.value.length >0 && input.value.length <= 140) || regex.test(input.value) === true){
+          await postMessage(input.value)
+          Mensajes.innerHTML = ""
+          getMessages()
+          input.value = ''; 
+        }
+        else{
+          alert('Mensaje no valido')
+        }     
       })
 
       input.addEventListener('keypress', async function(event) {
@@ -113,7 +127,7 @@
         const scrollPos = Mensajes.scrollTop
         Mensajes.innerHTML = ""
         getMessages()
-      },20000)
+      },60000)
       
       
       Contenedor.append(Mensajes)
